@@ -2,10 +2,9 @@
 pragma solidity ^0.5.13;
 
 import "forge-std/Script.sol";
-import "Precompiles.sol";
-import "contracts/common/GoldToken.sol";
+import "../src/PrecompileHandler.sol";
 
-contract PrecompileHelper is Script, Precompiles {
+contract Helper is Script, PrecompileHandler {
   function run() public {
     console.log("Precompiles Address");
     console.log(address(this));
