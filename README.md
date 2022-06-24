@@ -5,7 +5,7 @@ Celo Foundry Library is a collection of helpful contracts for use with [`forge` 
 ## Install
 
 ```bash
-forge install foundry-rs/forge-std
+forge install bowd/celo-foundry
 ```
 
 ## Precompile support
