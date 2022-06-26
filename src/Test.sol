@@ -7,9 +7,15 @@ import "./PrecompileHandler.sol";
 
 contract Test is ForgeTest, Precompiles {
     PrecompileHandler public ph;
+    address currentPrank;
 
     constructor() ForgeTest() public {
         ph = new PrecompileHandler();
+    }
+
+    function changePrank(address who) internal {
+      currentPrank = who;
+      super.changePrank(who);
     }
 
     function actor(string memory name) public returns (address) {
@@ -18,12 +24,4 @@ contract Test is ForgeTest, Precompiles {
       vm.label(addr, name);
       return addr;
     }
-
-    //function deal(address token, address to, uint256 give, bool adjust) public {
-    //  (, bytes memory symbolData) = token.call(0x1f1b7586);
-    //  if (keccak256(symbolData) == ) {
-    //  } else {
-    //    super.deal(token, to, give, adjust);
-    //  }
-    //}
 }
