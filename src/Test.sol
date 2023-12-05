@@ -91,7 +91,6 @@ contract Test is ForgeTest, Precompiles {
   ) internal virtual override {
     bytes memory creationCode = vm.getCode(what);
     vm.etch(where, abi.encodePacked(creationCode, args));
-    // (bool success, bytes memory runtimeBytecode) = where.call.value(value)("");
     (bool success, bytes memory runtimeBytecode) = where.call{ value: value }("");
     require(
       success,
