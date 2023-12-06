@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.8.20;
 
 import { Test as ForgeTest } from "forge-std/Test.sol";
 import "./Precompiles.sol";
@@ -9,7 +9,6 @@ contract Test is ForgeTest, Precompiles {
   PrecompileHandler public ph;
   address currentPrank;
 
-  event log_named_array(string key, address[] val);
   event log_named_array(string key, bytes32[] val);
   event log_array(string key, address[] val);
   event log_array(string key, bytes32[] val);
@@ -20,7 +19,7 @@ contract Test is ForgeTest, Precompiles {
 
   /* Utility functions */
 
-  function changePrank(address who) internal {
+  function changePrank(address who) internal virtual override {
     // Record current prank so helper functions can revert
     // if they need to prank
     currentPrank = who;
@@ -43,7 +42,7 @@ contract Test is ForgeTest, Precompiles {
 
   /* Extra assertions, extends forge-std/Test.sol */
 
-  function assertEq(address[] memory a, address[] memory b) internal {
+  function assertEq(address[] memory a, address[] memory b) internal virtual override {
     if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
       emit log("Error: a == b not satisfied [address[]]");
       emit log_named_array("  Expected", b);
@@ -52,7 +51,11 @@ contract Test is ForgeTest, Precompiles {
     }
   }
 
-  function assertEq(address[] memory a, address[] memory b, string memory err) internal {
+  function assertEq(
+    address[] memory a,
+    address[] memory b,
+    string memory err
+  ) internal virtual override {
     if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
       emit log_named_string("Error", err);
       assertEq(a, b);
@@ -68,20 +71,27 @@ contract Test is ForgeTest, Precompiles {
     }
   }
 
-  function deployCodeTo(string memory what, address where) internal {
+  function deployCodeTo(string memory what, address where) internal virtual override {
     deployCodeTo(what, "", 0, where);
   }
 
-  function deployCodeTo(string memory what, bytes memory args, address where) internal {
+  function deployCodeTo(
+    string memory what,
+    bytes memory args,
+    address where
+  ) internal virtual override {
     deployCodeTo(what, args, 0, where);
   }
 
-  function deployCodeTo(string memory what, bytes memory args, uint256 value, address where)
-    internal
-  {
+  function deployCodeTo(
+    string memory what,
+    bytes memory args,
+    uint256 value,
+    address where
+  ) internal virtual override {
     bytes memory creationCode = vm.getCode(what);
     vm.etch(where, abi.encodePacked(creationCode, args));
-    (bool success, bytes memory runtimeBytecode) = where.call.value(value)("");
+    (bool success, bytes memory runtimeBytecode) = where.call{ value: value }("");
     require(
       success,
       "StdCheats deployCodeTo(string,bytes,uint256,address): Failed to create runtime bytecode."

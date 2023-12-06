@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.8.20;
 
 import "forge-std/Vm.sol";
 import "forge-std/console2.sol";
@@ -9,7 +9,7 @@ contract PrecompileHandler is Precompiles {
   address constant private VM_ADDRESS =
     address(bytes20(uint160(uint256(keccak256('hevm cheat code')))));
 
-  Vm public constant vm = Vm(VM_ADDRESS);
+  Vm public constant _vm = Vm(VM_ADDRESS);
 
   bytes4 constant TRANSFER_SIG = bytes4(keccak256("transfer(address,address,uint256)"));
   bytes4 constant EPOCH_SIZE_SIG = bytes4(keccak256("epochSize()"));
@@ -30,41 +30,41 @@ contract PrecompileHandler is Precompiles {
   Mock private revertMock = Mock(true, _empty, true);
 
   constructor() public {
-    vm.etch(TRANSFER, proxyTo(TRANSFER_SIG));
-    vm.label(TRANSFER, "TRANSFER");
+    _vm.etch(TRANSFER, proxyTo(TRANSFER_SIG));
+    _vm.label(TRANSFER, "TRANSFER");
 
-    vm.etch(EPOCH_SIZE, proxyTo(EPOCH_SIZE_SIG));
-    vm.label(EPOCH_SIZE, "EPOCH_SIZE");
+    _vm.etch(EPOCH_SIZE, proxyTo(EPOCH_SIZE_SIG));
+    _vm.label(EPOCH_SIZE, "EPOCH_SIZE");
 
     bytes memory catchAllProxy = proxyTo(CATCHALL_SIG);
-    vm.etch(FRACTION_MUL, catchAllProxy);
-    vm.label(FRACTION_MUL, "FRACTION_MUL");
+    _vm.etch(FRACTION_MUL, catchAllProxy);
+    _vm.label(FRACTION_MUL, "FRACTION_MUL");
 
-    vm.etch(PROOF_OF_POSSESSION, catchAllProxy);
-    vm.label(PROOF_OF_POSSESSION, "PROOF_OF_POSSESSION");
+    _vm.etch(PROOF_OF_POSSESSION, catchAllProxy);
+    _vm.label(PROOF_OF_POSSESSION, "PROOF_OF_POSSESSION");
 
-    vm.etch(GET_VALIDATOR, catchAllProxy);
-    vm.label(GET_VALIDATOR, "GET_VALIDATOR");
+    _vm.etch(GET_VALIDATOR, catchAllProxy);
+    _vm.label(GET_VALIDATOR, "GET_VALIDATOR");
 
-    vm.etch(NUMBER_VALIDATORS, catchAllProxy);
-    vm.label(NUMBER_VALIDATORS, "NUMBER_VALIDATORS");
+    _vm.etch(NUMBER_VALIDATORS, catchAllProxy);
+    _vm.label(NUMBER_VALIDATORS, "NUMBER_VALIDATORS");
 
-    vm.etch(BLOCK_NUMBER_FROM_HEADER, catchAllProxy);
-    vm.label(BLOCK_NUMBER_FROM_HEADER, "BLOCK_NUMBER_FROM_HEADER");
+    _vm.etch(BLOCK_NUMBER_FROM_HEADER, catchAllProxy);
+    _vm.label(BLOCK_NUMBER_FROM_HEADER, "BLOCK_NUMBER_FROM_HEADER");
 
-    vm.etch(HASH_HEADER, catchAllProxy);
-    vm.label(HASH_HEADER, "HASH_HEADER");
+    _vm.etch(HASH_HEADER, catchAllProxy);
+    _vm.label(HASH_HEADER, "HASH_HEADER");
 
-    vm.etch(GET_PARENT_SEAL_BITMAP, catchAllProxy);
-    vm.label(GET_PARENT_SEAL_BITMAP, "GET_PARENT_SEAL_BITMAP");
+    _vm.etch(GET_PARENT_SEAL_BITMAP, catchAllProxy);
+    _vm.label(GET_PARENT_SEAL_BITMAP, "GET_PARENT_SEAL_BITMAP");
 
-    vm.etch(GET_VERIFIED_SEAL_BITMAP, catchAllProxy);
-    vm.label(GET_VERIFIED_SEAL_BITMAP, "GET_VERIFIED_SEAL_BITMAP");
+    _vm.etch(GET_VERIFIED_SEAL_BITMAP, catchAllProxy);
+    _vm.label(GET_VERIFIED_SEAL_BITMAP, "GET_VERIFIED_SEAL_BITMAP");
   }
 
   function transfer(address from, address to, uint256 amount) public returns (bool) {
-    vm.deal(from, from.balance - amount);
-    vm.deal(to, to.balance + amount);
+    _vm.deal(from, from.balance - amount);
+    _vm.deal(to, to.balance + amount);
     return true;
   }
 

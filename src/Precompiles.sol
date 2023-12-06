@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.8.20;
 
 contract Precompiles {
   address public constant TRANSFER = address(0xff - 2);
