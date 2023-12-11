@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.5.13 <0.8.20;
 
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import { Test as ForgeTest } from "forge-std-8/Test.sol";
 import "./Precompiles.sol";
 import "./PrecompileHandler.sol";
 
