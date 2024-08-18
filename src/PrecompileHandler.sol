@@ -1,15 +1,21 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "forge-std/Vm.sol";
-import "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 import "./Precompiles.sol";
 
-contract PrecompileHandler is Precompiles {
-  address constant private VM_ADDRESS =
-    address(bytes20(uint160(uint256(keccak256('hevm cheat code')))));
+interface MiniVm {
+  function deal(address account, uint256 balance) external;
 
-  Vm public constant vm = Vm(VM_ADDRESS);
+  function etch(address target, bytes calldata data) external;
+
+  function label(address target, string calldata label) external;
+}
+
+contract PrecompileHandler is Precompiles {
+  address private constant VM_ADDRESS = address(bytes20(uint160(uint256(keccak256("hevm cheat code")))));
+
+  MiniVm public constant vm = MiniVm(VM_ADDRESS);
 
   bytes4 constant TRANSFER_SIG = bytes4(keccak256("transfer(address,address,uint256)"));
   bytes4 constant EPOCH_SIZE_SIG = bytes4(keccak256("epochSize()"));
@@ -80,9 +86,9 @@ contract PrecompileHandler is Precompiles {
     setMock(prec, callHash, successMock);
 
     if (debug) {
-      console2.log("Mock success");
-      console2.log(prec);
-      console2.logBytes32(callHash);
+      console.log("Mock success");
+      console.log(prec);
+      console.logBytes32(callHash);
     }
   }
 
@@ -90,9 +96,9 @@ contract PrecompileHandler is Precompiles {
     setMock(prec, callHash, revertMock);
 
     if (debug) {
-      console2.log("Mock revert");
-      console2.log(prec);
-      console2.logBytes32(callHash);
+      console.log("Mock revert");
+      console.log(prec);
+      console.logBytes32(callHash);
     }
   }
 
@@ -100,10 +106,10 @@ contract PrecompileHandler is Precompiles {
     setMock(prec, callHash, Mock(true, returnData, true));
 
     if (debug) {
-      console2.log("Mock success with data");
-      console2.log(prec);
-      console2.logBytes32(callHash);
-      console2.logBytes(returnData);
+      console.log("Mock success with data");
+      console.log(prec);
+      console.logBytes32(callHash);
+      console.logBytes(returnData);
     }
   }
 
@@ -112,11 +118,7 @@ contract PrecompileHandler is Precompiles {
   }
 
   function setMock(address prec, bytes32 callHash, Mock memory mock) internal {
-    require(
-      prec >= GET_VERIFIED_SEAL_BITMAP && 
-      prec <= TRANSFER,
-      "precompile not supported"
-    );
+    require(prec >= GET_VERIFIED_SEAL_BITMAP && prec <= TRANSFER, "precompile not supported");
 
     mockedCalls[prec][callHash] = mock;
   }
@@ -135,22 +137,22 @@ contract PrecompileHandler is Precompiles {
     Mock memory mock = mockedCalls[msg.sender][cdh];
 
     if (mock.exists == false) {
-      console2.log(msg.sender);
-      console2.logBytes(cd);
-      console2.logBytes32(cdh);
+      console.log(msg.sender);
+      console.logBytes(cd);
+      console.logBytes32(cdh);
       revert("mock not defined for call");
     }
 
     if (mock.success == false) {
-        revert();
+      revert();
     }
 
     if (mock.returnData.length > 0) {
-        bytes memory returnData = mock.returnData;
-        assembly {
-            let rds := mload(returnData)
-            return(add(returnData, 0x20), rds)
-        }
+      bytes memory returnData = mock.returnData;
+      assembly {
+        let rds := mload(returnData)
+        return(add(returnData, 0x20), rds)
+      }
     }
   }
 
@@ -178,3 +180,4 @@ contract PrecompileHandler is Precompiles {
     return ptr;
   }
 }
+
